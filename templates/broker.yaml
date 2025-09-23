@@ -1,0 +1,81 @@
+apiVersion: broker.amq.io/v1beta1
+kind: ActiveMQArtemis
+metadata:
+  name: {{ include "broker.fullname" . }}
+  namespace: {{ include "broker.namespace" . }}
+  labels:
+  {{- include "broker.labels" . | nindent 4 }}
+  {{- with .Values.broker.additionalLabels }}
+    {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.broker.annotations }}
+  annotations:
+    {{ toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.broker.version}}
+  version: {{ . | quote }}
+  {{- end }}
+  {{- with .Values.broker.acceptors }}
+  acceptors:
+    {{- toYaml . | nindent 6}}
+  {{- end }}
+  {{- with .Values.broker.connectors }}
+  connectors:
+    {{- toYaml . | nindent 6}}
+  {{- end }}
+  {{- with .Values.broker.adminPassword}}
+  adminPassword: {{ . | quote }}
+  {{- end }}
+  {{- with .Values.broker.adminUser}}
+  adminUser: {{ . | quote }}
+  {{- end }}
+  {{- with .Values.broker.console }}
+  console:
+    {{- toYaml . | nindent 6}}
+  {{- end }}
+  {{- with .Values.broker.ingressDomain}}
+  ingressDomain: {{ . | quote }}
+  {{- end }}
+  {{- with .Values.broker.env }}
+  env:
+    {{- toYaml . | nindent 6 }}
+  {{- end }}
+  {{- with .Values.broker.resourceTemplates }}
+  resourceTemplates:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.broker.properties }}
+  brokerProperties:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  restricted: {{ .Values.broker.restricted }}
+  deploymentPlan:
+    {{- range $k, $v := .Values.broker.deploymentPlan}}
+    {{- if eq $k "extraMounts" }}
+      extraMounts:
+        {{- if and $v $v.configMaps }}
+        configMaps:
+          {{- toYaml $v.configMaps | nindent 10}}
+        {{- end }}
+        secrets:
+          {{- if and $v $v.secrets }}
+          {{- toYaml $v.secrets | nindent 10}}
+          {{- end }}
+          {{- if $.Values.jaasConfig.create }}
+          - {{ include "broker.jaasConfigSecretName" $ }}
+          {{- end }}
+          {{- if $.Values.loggingConfig.create }}
+          - {{ include "broker.loggingConfigSecretName" $ }}
+          {{- end }}
+          {{- if and $.Values.brokerProperties.create $.Values.brokerProperties.secrets }}
+          {{- range $i, $j := $.Values.brokerProperties.secrets}}
+          - {{ include "broker.brokerPropertiesSecretName" (list $ $j.name)}}
+          {{- end }}
+          {{- end }}
+    {{- else }}
+      {{ $k}}:
+        {{- toYaml $v | nindent 8}}
+    {{- end }}
+    {{- end }}
+

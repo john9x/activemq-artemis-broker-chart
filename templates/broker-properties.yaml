@@ -1,0 +1,19 @@
+{{- if and .Values.brokerProperties.create .Values.brokerProperties.secrets }}
+{{- range $k, $v := .Values.brokerProperties.secrets}}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "broker.brokerPropertiesSecretName" (list $ $v.name)}}
+  labels:
+  {{- include "broker.labels" $ | nindent 4 }}
+  {{- with $.Values.brokerProperties.annotations }}
+  annotations:
+    {{ toYaml . | nindent 4 }}
+  {{- end }}
+stringData:
+{{- range $i, $j := $v.items}}
+  {{ required "brokerProperites.secrets[].items[].filename is required" $j.filename }}: {{ $j.stringData | quote }}
+{{- end }}
+---
+{{- end }}
+{{- end }}
