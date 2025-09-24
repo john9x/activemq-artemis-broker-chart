@@ -4,6 +4,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: {{ include "broker.brokerPropertiesSecretName" (list $ $v.name)}}
+  namespace: {{ include "broker.namespace" . }}
   labels:
   {{- include "broker.labels" $ | nindent 4 }}
   {{- with $.Values.brokerProperties.annotations }}

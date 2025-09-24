@@ -3,6 +3,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: {{ include "broker.jaasConfigSecretName" . }}
+  namespace: {{ include "broker.namespace" . }}
   labels:
   {{- include "broker.labels" . | nindent 4 }}
   {{- with .Values.jaasConfig.annotations }}
