@@ -1,3 +1,19 @@
+{{- if and .Values.brokerProperties.create .Values.brokerProperties.jsonConfig }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "broker.brokerPropertiesSecretName" (list . "jsonConfig")}}
+  namespace: {{ include "broker.namespace" . }}
+  labels:
+    {{- include "broker.labels" . | nindent 4 }}
+    {{- with .Values.brokerProperties.annotations }}
+    annotations:
+      {{ toYaml . | nindent 4 }}
+    {{- end }}
+stringData:
+  config.json: {{ toJson .Values.brokerProperties.jsonConfig | quote }}
+---
+{{- end}}
 {{- if and .Values.brokerProperties.create .Values.brokerProperties.secrets }}
 {{- range $k, $v := .Values.brokerProperties.secrets}}
 apiVersion: v1

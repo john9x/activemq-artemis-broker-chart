@@ -67,5 +67,10 @@ loggingConfig:
 brokerProperties:
   create: false
   annotations: {}
+  jsonConfig: {}
+    #addressSettings:
+    #  "#":
+    #    redistributionDelay: 60000
+    #    maxDeliveryAttempts: 2
   secrets: []
 

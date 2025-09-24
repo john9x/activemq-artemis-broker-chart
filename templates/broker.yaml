@@ -68,6 +68,9 @@ spec:
           {{- if $.Values.loggingConfig.create }}
           - {{ include "broker.loggingConfigSecretName" $ }}
           {{- end }}
+          {{- if and $.Values.brokerProperties.create $.Values.brokerProperties.jsonConfig }}
+          - {{ include "broker.brokerPropertiesSecretName" (list $ "jsonConfig")}}
+          {{- end }}
           {{- if and $.Values.brokerProperties.create $.Values.brokerProperties.secrets }}
           {{- range $i, $j := $.Values.brokerProperties.secrets}}
           - {{ include "broker.brokerPropertiesSecretName" (list $ $j.name)}}
